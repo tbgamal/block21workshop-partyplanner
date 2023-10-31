@@ -19,13 +19,17 @@ async function render() {
 render();
 
 async function getEvents() {
-  let response = await fetch (API_URL);
-  console.log (response)
-  let json = await response.json()
-  console.log(json)
-  
-  state.events = json.data
-  console.log(state.events)
+  try{
+    let response = await fetch (API_URL);
+    console.log (response)
+    let json = await response.json()
+    console.log(json)
+    
+    state.events = json.data
+    console.log(state.events)
+  } catch(err) {
+    console.error(err);
+  }
 }
 
 getEvents()
@@ -61,11 +65,15 @@ function renderEvents() {
 }
 
 async function deleteEvent(id) {
-  const response = await fetch(API_URL + `/${id}`, {
-    method: "DELETE"
-  })
-
-  render()
+  try{
+    const response = await fetch(API_URL + `/${id}`, {
+      method: "DELETE"
+    })
+  
+    render()
+  } catch(err){
+    console.error(err)
+  }
 }
 
 async function addEvent(event) {
@@ -73,7 +81,7 @@ async function addEvent(event) {
 
   let name = addEventsForm.name.value
   let description = addEventsForm.description.value
-  let date = addEventsForm.date.value
+  let date = addEventsForm.date.value + ":00.000Z"
   let location = addEventsForm.location.value
 
   const response = await fetch (API_URL, {
