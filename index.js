@@ -14,7 +14,7 @@ addEventsForm.addEventListener("submit", addEvent)
 async function render() {
   await getEvents();
   renderEvents()
-
+  
 }
 render();
 
@@ -23,7 +23,7 @@ async function getEvents() {
   console.log (response)
   let json = await response.json()
   console.log(json)
-
+  
   state.events = json.data
   console.log(state.events)
 }
@@ -35,18 +35,54 @@ function renderEvents() {
     eventList.innerHTML = "<li>No events.</li>"
     return;
   }
-
+  
   const eventCards = state.events.map ((event) => {
     const li = document.createElement("li");
     li.innerHTML = `
-      <h2>${event.name}</h2>
-      <p>${event.description}</p>
-      <p>${event.date}</p>
-      <p>${event.location}</p>
+    <h2>${event.name}</h2>
+    <p>${event.description}</p>
+    <p>${event.date}</p>
+    <p>${event.location}</p>
     `;
+    
+    const deleteBtn = document.createElement("button")
+    deleteBtn.innerText = "DELETE"
+    deleteBtn.addEventListener("click", () => {
+      deleteEvent(event.id)
+    })
 
-
+    li.appendChild(deleteBtn)
+    return li
+    
+    
   })
 
   eventList.replaceChildren(...eventCards);
+}
+
+async function deleteEvent(id) {
+  const response = await fetch(API_URL + `/${id}`, {
+    method: "DELETE"
+  })
+
+  render()
+}
+
+async function addEvent(event) {
+  event.preventDefault();
+
+  let name = addEventsForm.name.value
+  let description = addEventsForm.description.value
+  let date = addEventsForm.date.value
+  let location = addEventsForm.location.value
+
+  const response = await fetch (API_URL, {
+    method: "POST",
+    headers: {"Content-type": "application/json"},
+    body: JSON.stringify({
+      name, description, date, location
+    })
+  })
+
+  render()
 }
